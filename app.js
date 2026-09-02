@@ -6,6 +6,10 @@ const modules={
 };
 
 const TVDI_HLS='https://motortv.scad.mx/hls/canal.m3u8';
+const channelMeta={
+  tvdi:{name:'TV Digital Internet',description:'Canal general de televisión con transmisión continua 24/7.'},
+  comunidad:{name:'Canal Comunidad',description:'Canal propio de la comunidad. Fuente pendiente de configuración.'}
+};
 const modal=document.getElementById('moduleModal');
 const modalTitle=document.getElementById('modalTitle');
 const modalDescription=document.getElementById('modalDescription');
@@ -22,7 +26,8 @@ const tvScreen=document.getElementById('tvScreen');
 const tvVideo=document.getElementById('tvVideo');
 const tvPlaceholder=document.getElementById('tvPlaceholder');
 const tvScreenCenter=document.getElementById('tvScreenCenter');
-const tvLiveBadge=document.getElementById('tvLiveBadge');
+const tvChannelName=document.getElementById('tvChannelName');
+const tvChannelDescription=document.getElementById('tvChannelDescription');
 let tvMuted=true;
 let hls=null;
 
@@ -33,8 +38,8 @@ function openCommunityInfo(){showModal('Comunidad Central','Información básica
 function closeModal(){modal.hidden=true;document.body.style.overflow=''}
 
 function destroyHls(){if(hls){hls.destroy();hls=null}tvVideo.pause();tvVideo.removeAttribute('src');tvVideo.load()}
-
-function setPlaceholder(active){tvPlaceholder.hidden=!active;tvScreenCenter.hidden=!active;tvLiveBadge.hidden=active;tvVideo.hidden=active}
+function setPlaceholder(active){tvPlaceholder.hidden=!active;tvScreenCenter.hidden=!active;tvVideo.hidden=active}
+function updateChannelMeta(channel){const meta=channelMeta[channel]||channelMeta.tvdi;tvChannelName.textContent=meta.name;tvChannelDescription.textContent=meta.description}
 
 function playTvdi(){
   destroyHls();
@@ -58,6 +63,7 @@ function playTvdi(){
 
 function setTvChannel(channel){
   tvScreen.dataset.channel=channel;
+  updateChannelMeta(channel);
   if(channel==='tvdi'){
     playTvdi();
   }else{
