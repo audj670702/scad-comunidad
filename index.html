@@ -18,14 +18,17 @@
         <img src="img/logo_scad_comunidad.png" alt="SCaD Comunidad" />
       </a>
 
-      <button class="identity-button" id="identityButton" type="button" aria-expanded="false" aria-label="Abrir perfil">
-        <span class="avatar">JD</span>
-        <span class="identity-copy">
-          <strong>Usuario Demo</strong>
-          <small>Comunidad Central</small>
-        </span>
-        <span class="chevron">⌄</span>
-      </button>
+      <div class="topbar-actions">
+        <button class="install-button" id="installAppButton" type="button">Instalar app</button>
+        <button class="identity-button" id="identityButton" type="button" aria-expanded="false" aria-label="Abrir perfil">
+          <span class="avatar">JD</span>
+          <span class="identity-copy">
+            <strong>Usuario Demo</strong>
+            <small>Comunidad Central</small>
+          </span>
+          <span class="chevron">⌄</span>
+        </button>
+      </div>
 
       <div class="identity-menu" id="identityMenu" hidden>
         <div class="identity-menu-head">
@@ -40,7 +43,13 @@
     <main id="inicio">
       <section class="home-top" aria-label="Inicio de comunidad">
         <div class="home-label home-label-community">Mi comunidad</div>
-        <div class="home-label home-label-tv">TV - Transmisión Continua.</div>
+        <label class="home-channel-selector">
+          <span>Canal</span>
+          <select id="tvChannelSelect" aria-label="Cambiar canal">
+            <option value="tvdi">TV Digital Internet</option>
+            <option value="comunidad">Canal Comunidad</option>
+          </select>
+        </label>
 
         <article class="community-card">
           <div class="community-logo" aria-label="Logotipo de la comunidad">CC</div>
@@ -59,13 +68,6 @@
             </div>
           </div>
           <div class="tv-controls">
-            <label class="tv-channel-field">
-              <span>Canal</span>
-              <select id="tvChannelSelect" aria-label="Cambiar canal">
-                <option value="tvdi">TV Digital Internet</option>
-                <option value="comunidad">Canal Comunidad</option>
-              </select>
-            </label>
             <button class="tv-icon-button" id="tvMuteButton" type="button" aria-label="Activar sonido" title="Activar sonido"><span id="tvMuteIcon">🔇</span></button>
             <button class="tv-icon-button" id="tvFullscreenButton" type="button" aria-label="Ampliar a pantalla completa" title="Pantalla completa">⛶</button>
           </div>
@@ -74,14 +76,9 @@
         <div class="community-subline">
           <button class="community-info-button" id="communityInfoButton" type="button">+ Info</button>
         </div>
-        <div class="tv-subline">
-          <strong id="tvChannelName">TV Digital Internet</strong>
-          <span id="tvChannelDescription">Canal general de televisión con transmisión continua 24/7.</span>
-        </div>
       </section>
 
-      <section class="section-block" aria-labelledby="modulesTitle">
-        <div class="section-heading"><div><span class="eyebrow">MÓDULOS</span><h2 id="modulesTitle">¿Qué quieres consultar?</h2></div></div>
+      <section class="section-block" aria-label="Módulos disponibles">
         <div class="module-grid">
           <button class="module-card module-programacion" data-module="programacion" type="button"><span class="module-icon" aria-hidden="true">◷</span><span class="module-content"><strong>Programación</strong><small>Actividades, eventos y agenda</small></span><span class="module-meta">3 próximos</span></button>
           <button class="module-card module-mensajeria" data-module="mensajeria" type="button"><span class="module-icon" aria-hidden="true">✉</span><span class="module-content"><strong>Mensajería</strong><small>Conversaciones, avisos y comunicación</small></span><span class="module-meta alert">2 nuevos</span></button>
@@ -107,7 +104,7 @@
         </article>
       </section>
 
-      <footer class="app-footer"><span>SCaD Comunidad · v0.2.4</span><span>Conexión · Organización · Participación</span></footer>
+      <footer class="app-footer"><span>SCaD Comunidad · v0.2.5</span><span>Conexión · Organización · Participación</span></footer>
     </main>
 
     <nav class="bottom-nav" aria-label="Navegación principal">
