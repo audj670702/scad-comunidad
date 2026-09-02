@@ -30,10 +30,7 @@
       <div class="identity-menu" id="identityMenu" hidden>
         <div class="identity-menu-head">
           <span class="avatar avatar-large">JD</span>
-          <div>
-            <strong>Usuario Demo</strong>
-            <small>Miembro activo</small>
-          </div>
+          <div><strong>Usuario Demo</strong><small>Miembro activo</small></div>
         </div>
         <button type="button" data-route="perfil">Mi perfil</button>
         <button type="button">Cerrar sesión</button>
@@ -54,9 +51,10 @@
 
         <article class="tv-monitor">
           <div class="tv-screen" id="tvScreen">
-            <div class="tv-screen-bg"></div>
-            <div class="tv-live-badge"><span></span> EN VIVO</div>
-            <div class="tv-screen-center">
+            <video id="tvVideo" autoplay muted playsinline preload="auto" aria-label="TV Digital Internet en vivo"></video>
+            <div class="tv-screen-bg" id="tvPlaceholder"></div>
+            <div class="tv-live-badge" id="tvLiveBadge"><span></span> EN VIVO</div>
+            <div class="tv-screen-center" id="tvScreenCenter">
               <span class="tv-play">▶</span>
             </div>
           </div>
@@ -72,37 +70,12 @@
       </section>
 
       <section class="section-block" aria-labelledby="modulesTitle">
-        <div class="section-heading">
-          <div>
-            <span class="eyebrow">MÓDULOS</span>
-            <h2 id="modulesTitle">¿Qué quieres consultar?</h2>
-          </div>
-        </div>
-
+        <div class="section-heading"><div><span class="eyebrow">MÓDULOS</span><h2 id="modulesTitle">¿Qué quieres consultar?</h2></div></div>
         <div class="module-grid">
-          <button class="module-card module-programacion" data-module="programacion" type="button">
-            <span class="module-icon" aria-hidden="true">◷</span>
-            <span class="module-content"><strong>Programación</strong><small>Actividades, eventos y agenda</small></span>
-            <span class="module-meta">3 próximos</span>
-          </button>
-
-          <button class="module-card module-mensajeria" data-module="mensajeria" type="button">
-            <span class="module-icon" aria-hidden="true">✉</span>
-            <span class="module-content"><strong>Mensajería</strong><small>Conversaciones, avisos y comunicación</small></span>
-            <span class="module-meta alert">2 nuevos</span>
-          </button>
-
-          <button class="module-card module-capacitacion" data-module="capacitacion" type="button">
-            <span class="module-icon" aria-hidden="true">▤</span>
-            <span class="module-content"><strong>Capacitación</strong><small>Contenidos y aprendizaje</small></span>
-            <span class="module-meta">1 pendiente</span>
-          </button>
-
-          <button class="module-card module-documentacion" data-module="documentacion" type="button">
-            <span class="module-icon" aria-hidden="true">▣</span>
-            <span class="module-content"><strong>Documentación</strong><small>Reglamentos, guías y archivos</small></span>
-            <span class="module-meta">Consulta</span>
-          </button>
+          <button class="module-card module-programacion" data-module="programacion" type="button"><span class="module-icon" aria-hidden="true">◷</span><span class="module-content"><strong>Programación</strong><small>Actividades, eventos y agenda</small></span><span class="module-meta">3 próximos</span></button>
+          <button class="module-card module-mensajeria" data-module="mensajeria" type="button"><span class="module-icon" aria-hidden="true">✉</span><span class="module-content"><strong>Mensajería</strong><small>Conversaciones, avisos y comunicación</small></span><span class="module-meta alert">2 nuevos</span></button>
+          <button class="module-card module-capacitacion" data-module="capacitacion" type="button"><span class="module-icon" aria-hidden="true">▤</span><span class="module-content"><strong>Capacitación</strong><small>Contenidos y aprendizaje</small></span><span class="module-meta">1 pendiente</span></button>
+          <button class="module-card module-documentacion" data-module="documentacion" type="button"><span class="module-icon" aria-hidden="true">▣</span><span class="module-content"><strong>Documentación</strong><small>Reglamentos, guías y archivos</small></span><span class="module-meta">Consulta</span></button>
         </div>
       </section>
 
@@ -115,7 +88,6 @@
             <button class="event-row" data-module="programacion" type="button"><time datetime="2026-09-12"><strong>12</strong><span>SEP</span></time><span class="event-info"><small>17:30 · FORMACIÓN</small><strong>Sesión informativa</strong><span>Sala principal</span></span><span class="row-arrow">›</span></button>
           </div>
         </article>
-
         <article class="panel notices-panel">
           <div class="panel-heading"><div><span class="eyebrow">AVISOS</span><h2>Para ti</h2></div></div>
           <button class="notice" data-module="mensajeria" type="button"><span class="notice-dot"></span><span><strong>Nuevo mensaje de administración</strong><small>Hace 18 min</small></span></button>
@@ -124,7 +96,7 @@
         </article>
       </section>
 
-      <footer class="app-footer"><span>SCaD Comunidad · v0.2.2</span><span>Conexión · Organización · Participación</span></footer>
+      <footer class="app-footer"><span>SCaD Comunidad · v0.2.3</span><span>Conexión · Organización · Participación</span></footer>
     </main>
 
     <nav class="bottom-nav" aria-label="Navegación principal">
@@ -139,12 +111,11 @@
     <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <button class="modal-close" id="modalClose" type="button" aria-label="Cerrar">×</button>
       <span class="modal-kicker" id="modalKicker">PROTOTIPO</span>
-      <h2 id="modalTitle">Módulo</h2>
-      <p id="modalDescription"></p>
-      <div id="modalContent" class="modal-content"></div>
+      <h2 id="modalTitle">Módulo</h2><p id="modalDescription"></p><div id="modalContent" class="modal-content"></div>
     </section>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
