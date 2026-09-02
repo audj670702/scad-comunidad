@@ -41,29 +41,32 @@
     </header>
 
     <main id="inicio">
-      <section class="home-top" aria-label="TV Comunidad">
+      <section class="home-top" aria-label="Inicio de comunidad">
+        <article class="community-card">
+          <div class="community-logo" aria-label="Logotipo de la comunidad">CC</div>
+          <div class="community-card-copy">
+            <small>MI COMUNIDAD</small>
+            <strong>Comunidad Central</strong>
+            <span>Miembro activo</span>
+          </div>
+          <button class="community-info-button" id="communityInfoButton" type="button">+ Info</button>
+        </article>
+
         <article class="tv-monitor">
           <div class="tv-screen" id="tvScreen">
             <div class="tv-screen-bg"></div>
             <div class="tv-live-badge"><span></span> EN VIVO</div>
             <div class="tv-screen-center">
               <span class="tv-play">▶</span>
-              <strong id="tvScreenTitle">TV Digital Internet</strong>
-              <small id="tvScreenSubtitle">Canal general · 24/7</small>
             </div>
-            <div class="tv-screen-brand">SCaD Comunidad</div>
           </div>
           <div class="tv-controls">
-            <div class="tv-channel-control">
-              <span class="tv-label">TV Comunidad</span>
-              <select id="tvChannelSelect" aria-label="Cambiar canal">
-                <option value="tvdi">TV Digital Internet</option>
-                <option value="comunidad">Canal Comunidad</option>
-              </select>
-            </div>
-            <button class="tv-icon-button" id="tvMuteButton" type="button" aria-label="Activar sonido" title="Activar sonido">
-              <span id="tvMuteIcon">🔇</span>
-            </button>
+            <select id="tvChannelSelect" aria-label="Cambiar canal">
+              <option value="tvdi">TV Digital Internet</option>
+              <option value="comunidad">Canal Comunidad</option>
+            </select>
+            <button class="tv-icon-button" id="tvMuteButton" type="button" aria-label="Activar sonido" title="Activar sonido"><span id="tvMuteIcon">🔇</span></button>
+            <button class="tv-icon-button" id="tvFullscreenButton" type="button" aria-label="Ampliar a pantalla completa" title="Pantalla completa">⛶</button>
           </div>
         </article>
       </section>
@@ -79,37 +82,25 @@
         <div class="module-grid">
           <button class="module-card module-programacion" data-module="programacion" type="button">
             <span class="module-icon" aria-hidden="true">◷</span>
-            <span class="module-content">
-              <strong>Programación</strong>
-              <small>Actividades, eventos y agenda</small>
-            </span>
+            <span class="module-content"><strong>Programación</strong><small>Actividades, eventos y agenda</small></span>
             <span class="module-meta">3 próximos</span>
           </button>
 
           <button class="module-card module-mensajeria" data-module="mensajeria" type="button">
             <span class="module-icon" aria-hidden="true">✉</span>
-            <span class="module-content">
-              <strong>Mensajería</strong>
-              <small>Conversaciones, avisos y comunicación</small>
-            </span>
+            <span class="module-content"><strong>Mensajería</strong><small>Conversaciones, avisos y comunicación</small></span>
             <span class="module-meta alert">2 nuevos</span>
           </button>
 
           <button class="module-card module-capacitacion" data-module="capacitacion" type="button">
             <span class="module-icon" aria-hidden="true">▤</span>
-            <span class="module-content">
-              <strong>Capacitación</strong>
-              <small>Contenidos y aprendizaje</small>
-            </span>
+            <span class="module-content"><strong>Capacitación</strong><small>Contenidos y aprendizaje</small></span>
             <span class="module-meta">1 pendiente</span>
           </button>
 
-          <button class="module-card module-info" data-module="info" type="button">
-            <span class="module-icon" aria-hidden="true">＋</span>
-            <span class="module-content">
-              <strong>+ Info</strong>
-              <small>Información relevante de tu comunidad</small>
-            </span>
+          <button class="module-card module-documentacion" data-module="documentacion" type="button">
+            <span class="module-icon" aria-hidden="true">▣</span>
+            <span class="module-content"><strong>Documentación</strong><small>Reglamentos, guías y archivos</small></span>
             <span class="module-meta">Consulta</span>
           </button>
         </div>
@@ -117,85 +108,23 @@
 
       <section class="dashboard-grid">
         <article class="panel agenda-panel">
-          <div class="panel-heading">
-            <div>
-              <span class="eyebrow">AGENDA</span>
-              <h2>Próximas actividades</h2>
-            </div>
-            <button class="text-button" data-module="programacion" type="button">Ver todas</button>
-          </div>
-
+          <div class="panel-heading"><div><span class="eyebrow">AGENDA</span><h2>Próximas actividades</h2></div><button class="text-button" data-module="programacion" type="button">Ver todas</button></div>
           <div class="timeline">
-            <button class="event-row" data-module="programacion" type="button">
-              <time datetime="2026-09-03"><strong>03</strong><span>SEP</span></time>
-              <span class="event-info">
-                <small>18:00 · ACTIVIDAD GENERAL</small>
-                <strong>Reunión general</strong>
-                <span>Punto de reunión principal</span>
-              </span>
-              <span class="row-arrow">›</span>
-            </button>
-
-            <button class="event-row" data-module="programacion" type="button">
-              <time datetime="2026-09-06"><strong>06</strong><span>SEP</span></time>
-              <span class="event-info">
-                <small>09:00 · COMUNIDAD</small>
-                <strong>Jornada comunitaria</strong>
-                <span>Área común</span>
-              </span>
-              <span class="row-arrow">›</span>
-            </button>
-
-            <button class="event-row" data-module="programacion" type="button">
-              <time datetime="2026-09-12"><strong>12</strong><span>SEP</span></time>
-              <span class="event-info">
-                <small>17:30 · FORMACIÓN</small>
-                <strong>Sesión informativa</strong>
-                <span>Sala principal</span>
-              </span>
-              <span class="row-arrow">›</span>
-            </button>
+            <button class="event-row" data-module="programacion" type="button"><time datetime="2026-09-03"><strong>03</strong><span>SEP</span></time><span class="event-info"><small>18:00 · ACTIVIDAD GENERAL</small><strong>Reunión general</strong><span>Punto de reunión principal</span></span><span class="row-arrow">›</span></button>
+            <button class="event-row" data-module="programacion" type="button"><time datetime="2026-09-06"><strong>06</strong><span>SEP</span></time><span class="event-info"><small>09:00 · COMUNIDAD</small><strong>Jornada comunitaria</strong><span>Área común</span></span><span class="row-arrow">›</span></button>
+            <button class="event-row" data-module="programacion" type="button"><time datetime="2026-09-12"><strong>12</strong><span>SEP</span></time><span class="event-info"><small>17:30 · FORMACIÓN</small><strong>Sesión informativa</strong><span>Sala principal</span></span><span class="row-arrow">›</span></button>
           </div>
         </article>
 
         <article class="panel notices-panel">
-          <div class="panel-heading">
-            <div>
-              <span class="eyebrow">AVISOS</span>
-              <h2>Para ti</h2>
-            </div>
-          </div>
-
-          <button class="notice" data-module="mensajeria" type="button">
-            <span class="notice-dot"></span>
-            <span>
-              <strong>Nuevo mensaje de administración</strong>
-              <small>Hace 18 min</small>
-            </span>
-          </button>
-
-          <button class="notice" data-module="capacitacion" type="button">
-            <span class="notice-dot soft"></span>
-            <span>
-              <strong>Tienes contenido pendiente</strong>
-              <small>Capacitación</small>
-            </span>
-          </button>
-
-          <button class="notice" data-module="programacion" type="button">
-            <span class="notice-dot soft"></span>
-            <span>
-              <strong>Actividad confirmada</strong>
-              <small>3 de septiembre · 18:00</small>
-            </span>
-          </button>
+          <div class="panel-heading"><div><span class="eyebrow">AVISOS</span><h2>Para ti</h2></div></div>
+          <button class="notice" data-module="mensajeria" type="button"><span class="notice-dot"></span><span><strong>Nuevo mensaje de administración</strong><small>Hace 18 min</small></span></button>
+          <button class="notice" data-module="capacitacion" type="button"><span class="notice-dot soft"></span><span><strong>Tienes contenido pendiente</strong><small>Capacitación</small></span></button>
+          <button class="notice" data-module="programacion" type="button"><span class="notice-dot soft"></span><span><strong>Actividad confirmada</strong><small>3 de septiembre · 18:00</small></span></button>
         </article>
       </section>
 
-      <footer class="app-footer">
-        <span>SCaD Comunidad · v0.2.1</span>
-        <span>Conexión · Organización · Participación</span>
-      </footer>
+      <footer class="app-footer"><span>SCaD Comunidad · v0.2.2</span><span>Conexión · Organización · Participación</span></footer>
     </main>
 
     <nav class="bottom-nav" aria-label="Navegación principal">
