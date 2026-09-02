@@ -6,10 +6,6 @@ const modules={
 };
 
 const TVDI_HLS='https://motortv.scad.mx/hls/canal.m3u8';
-const channelMeta={
-  tvdi:{name:'TV Digital Internet',description:'Canal general de televisión con transmisión continua 24/7.'},
-  comunidad:{name:'Canal Comunidad',description:'Canal propio de la comunidad. Fuente pendiente de configuración.'}
-};
 const modal=document.getElementById('moduleModal');
 const modalTitle=document.getElementById('modalTitle');
 const modalDescription=document.getElementById('modalDescription');
@@ -17,6 +13,7 @@ const modalContent=document.getElementById('modalContent');
 const modalClose=document.getElementById('modalClose');
 const identityButton=document.getElementById('identityButton');
 const identityMenu=document.getElementById('identityMenu');
+const installAppButton=document.getElementById('installAppButton');
 const communityInfoButton=document.getElementById('communityInfoButton');
 const tvChannelSelect=document.getElementById('tvChannelSelect');
 const tvMuteButton=document.getElementById('tvMuteButton');
@@ -26,10 +23,9 @@ const tvScreen=document.getElementById('tvScreen');
 const tvVideo=document.getElementById('tvVideo');
 const tvPlaceholder=document.getElementById('tvPlaceholder');
 const tvScreenCenter=document.getElementById('tvScreenCenter');
-const tvChannelName=document.getElementById('tvChannelName');
-const tvChannelDescription=document.getElementById('tvChannelDescription');
 let tvMuted=true;
 let hls=null;
+let deferredInstallPrompt=null;
 
 function showModal(title,description,html){modalTitle.textContent=title;modalDescription.textContent=description;modalContent.innerHTML=html;modal.hidden=false;document.body.style.overflow='hidden'}
 function openModule(key){const item=modules[key];if(!item)return;showModal(item.title,item.description,`<span class="prototype-chip">Vista demostrativa</span>${item.rows.map(([label,value])=>`<div class="prototype-row"><strong>${label}</strong><span>${value}</span></div>`).join('')}`)}
@@ -39,49 +35,17 @@ function closeModal(){modal.hidden=true;document.body.style.overflow=''}
 
 function destroyHls(){if(hls){hls.destroy();hls=null}tvVideo.pause();tvVideo.removeAttribute('src');tvVideo.load()}
 function setPlaceholder(active){tvPlaceholder.hidden=!active;tvScreenCenter.hidden=!active;tvVideo.hidden=active}
-function updateChannelMeta(channel){const meta=channelMeta[channel]||channelMeta.tvdi;tvChannelName.textContent=meta.name;tvChannelDescription.textContent=meta.description}
-
-function playTvdi(){
-  destroyHls();
-  setPlaceholder(false);
-  tvVideo.muted=tvMuted;
-  if(tvVideo.canPlayType('application/vnd.apple.mpegurl')){
-    tvVideo.src=TVDI_HLS;
-    tvVideo.play().catch(()=>{});
-    return;
-  }
-  if(window.Hls&&Hls.isSupported()){
-    hls=new Hls({enableWorker:true,lowLatencyMode:false,backBufferLength:30});
-    hls.loadSource(TVDI_HLS);
-    hls.attachMedia(tvVideo);
-    hls.on(Hls.Events.MANIFEST_PARSED,()=>tvVideo.play().catch(()=>{}));
-    hls.on(Hls.Events.ERROR,(_,data)=>{if(data.fatal){setPlaceholder(true)}});
-    return;
-  }
-  setPlaceholder(true);
-}
-
-function setTvChannel(channel){
-  tvScreen.dataset.channel=channel;
-  updateChannelMeta(channel);
-  if(channel==='tvdi'){
-    playTvdi();
-  }else{
-    destroyHls();
-    setPlaceholder(true);
-  }
-}
-
-function toggleTvMute(){
-  tvMuted=!tvMuted;
-  tvVideo.muted=tvMuted;
-  tvMuteIcon.textContent=tvMuted?'🔇':'🔊';
-  tvMuteButton.setAttribute('aria-label',tvMuted?'Activar sonido':'Silenciar');
-  tvMuteButton.setAttribute('title',tvMuted?'Activar sonido':'Silenciar');
-  if(!tvMuted)tvVideo.play().catch(()=>{});
-}
-
+function playTvdi(){destroyHls();setPlaceholder(false);tvVideo.muted=tvMuted;if(tvVideo.canPlayType('application/vnd.apple.mpegurl')){tvVideo.src=TVDI_HLS;tvVideo.play().catch(()=>{});return}if(window.Hls&&Hls.isSupported()){hls=new Hls({enableWorker:true,lowLatencyMode:false,backBufferLength:30});hls.loadSource(TVDI_HLS);hls.attachMedia(tvVideo);hls.on(Hls.Events.MANIFEST_PARSED,()=>tvVideo.play().catch(()=>{}));hls.on(Hls.Events.ERROR,(_,data)=>{if(data.fatal)setPlaceholder(true)});return}setPlaceholder(true)}
+function setTvChannel(channel){tvScreen.dataset.channel=channel;if(channel==='tvdi'){playTvdi()}else{destroyHls();setPlaceholder(true)}}
+function toggleTvMute(){tvMuted=!tvMuted;tvVideo.muted=tvMuted;tvMuteIcon.textContent=tvMuted?'🔇':'🔊';tvMuteButton.setAttribute('aria-label',tvMuted?'Activar sonido':'Silenciar');tvMuteButton.setAttribute('title',tvMuted?'Activar sonido':'Silenciar');if(!tvMuted)tvVideo.play().catch(()=>{})}
 async function toggleFullscreen(){try{if(!document.fullscreenElement){await tvScreen.requestFullscreen()}else{await document.exitFullscreen()}}catch(e){}}
+
+function isInstalled(){return window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true}
+function setInstalledState(){installAppButton.textContent='App instalada';installAppButton.classList.add('installed');installAppButton.disabled=true}
+if(isInstalled())setInstalledState();
+window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();deferredInstallPrompt=event;if(!isInstalled()){installAppButton.textContent='Instalar app';installAppButton.classList.remove('installed');installAppButton.disabled=false}});
+window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;setInstalledState()});
+installAppButton.addEventListener('click',async()=>{if(isInstalled()){setInstalledState();return}if(deferredInstallPrompt){deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;return}showModal('Instalar app','La instalación depende del navegador y del dispositivo.',`<div class="prototype-row"><strong>Chrome / Android</strong><span>Usa la opción Instalar aplicación del navegador.</span></div><div class="prototype-row"><strong>Safari / iPhone</strong><span>Compartir → Añadir a pantalla de inicio.</span></div>`) });
 
 document.querySelectorAll('[data-module]').forEach(button=>button.addEventListener('click',()=>openModule(button.dataset.module)));
 document.querySelectorAll('[data-route="perfil"]').forEach(button=>button.addEventListener('click',()=>{identityMenu.hidden=true;identityButton.setAttribute('aria-expanded','false');openProfile()}));
