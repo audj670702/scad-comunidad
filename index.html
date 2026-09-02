@@ -2,10 +2,12 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#111827" />
-  <meta name="description" content="SCaD Comunidad · Plataforma digital para comunidades organizadas" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0B1D36" />
+  <meta name="description" content="SCaD Comunidad · Conexión, organización y participación" />
   <title>SCaD Comunidad</title>
+  <link rel="icon" type="image/png" href="img/scad_comunidad_favicon.png" />
+  <link rel="apple-touch-icon" href="img/icon_scad_comunidad_192.png" />
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -13,141 +15,181 @@
   <div class="app-shell">
     <header class="topbar">
       <a class="brand" href="#inicio" aria-label="SCaD Comunidad">
-        <span class="brand-mark">SC</span>
-        <span class="brand-copy">
-          <strong>SCaD Comunidad</strong>
-          <small>Conecta · Organiza · Participa</small>
-        </span>
+        <img src="img/logo_scad_comunidad.png" alt="SCaD Comunidad" />
       </a>
 
-      <button class="identity-button" id="identityButton" type="button" aria-expanded="false">
+      <button class="identity-button" id="identityButton" type="button" aria-expanded="false" aria-label="Abrir perfil">
         <span class="avatar">JD</span>
         <span class="identity-copy">
-          <strong>Usuario demo</strong>
-          <small>Mi comunidad</small>
+          <strong>Usuario Demo</strong>
+          <small>Comunidad Central</small>
         </span>
         <span class="chevron">⌄</span>
       </button>
 
       <div class="identity-menu" id="identityMenu" hidden>
-        <button type="button">Mi perfil</button>
+        <div class="identity-menu-head">
+          <span class="avatar avatar-large">JD</span>
+          <div>
+            <strong>Usuario Demo</strong>
+            <small>Miembro activo</small>
+          </div>
+        </div>
+        <button type="button" data-route="perfil">Mi perfil</button>
         <button type="button">Cerrar sesión</button>
       </div>
     </header>
 
-    <main>
-      <section class="hero" id="inicio">
-        <div>
-          <span class="eyebrow">PROTOTIPO · v0.1.0</span>
-          <h1>Tu comunidad, en un solo lugar.</h1>
-          <p>Consulta actividades, mantente en comunicación, accede a contenidos y participa desde cualquier dispositivo.</p>
+    <main id="inicio">
+      <section class="welcome-card">
+        <div class="welcome-copy">
+          <span class="eyebrow">SCaD COMUNIDAD · v0.2.0</span>
+          <h1>Hola, Usuario.</h1>
+          <p>Todo lo que necesitas de tu comunidad, organizado en un solo lugar.</p>
         </div>
-        <div class="hero-status">
-          <span class="status-dot"></span>
+        <div class="community-chip">
+          <span class="community-symbol">C</span>
           <div>
-            <strong>Comunidad activa</strong>
-            <small>Experiencia de demostración</small>
+            <small>Tu comunidad</small>
+            <strong>Comunidad Central</strong>
           </div>
         </div>
       </section>
 
-      <section class="quick-summary" aria-label="Resumen">
-        <article>
-          <span class="metric">3</span>
-          <span>Próximas actividades</span>
-        </article>
-        <article>
-          <span class="metric">2</span>
-          <span>Mensajes nuevos</span>
-        </article>
-        <article>
-          <span class="metric">1</span>
-          <span>Contenido pendiente</span>
-        </article>
-      </section>
-
-      <section class="modules-section" aria-labelledby="modulesTitle">
+      <section class="section-block" aria-labelledby="modulesTitle">
         <div class="section-heading">
           <div>
-            <span class="eyebrow">ACCESO RÁPIDO</span>
-            <h2 id="modulesTitle">Servicios de la comunidad</h2>
+            <span class="eyebrow">MÓDULOS</span>
+            <h2 id="modulesTitle">¿Qué quieres consultar?</h2>
           </div>
         </div>
 
         <div class="module-grid">
-          <button class="module-card" data-module="programacion" type="button">
-            <span class="module-icon">◷</span>
+          <button class="module-card module-programacion" data-module="programacion" type="button">
+            <span class="module-icon" aria-hidden="true">◷</span>
             <span class="module-content">
               <strong>Programación</strong>
-              <small>Eventos, actividades y agenda</small>
+              <small>Actividades, eventos y agenda</small>
             </span>
-            <span class="module-arrow">→</span>
+            <span class="module-meta">3 próximos</span>
           </button>
 
-          <button class="module-card" data-module="mensajeria" type="button">
-            <span class="module-icon">✉</span>
+          <button class="module-card module-mensajeria" data-module="mensajeria" type="button">
+            <span class="module-icon" aria-hidden="true">✉</span>
             <span class="module-content">
               <strong>Mensajería</strong>
-              <small>Conversaciones y avisos</small>
+              <small>Conversaciones, avisos y comunicación</small>
             </span>
-            <span class="module-badge">2</span>
-            <span class="module-arrow">→</span>
+            <span class="module-meta alert">2 nuevos</span>
           </button>
 
-          <button class="module-card" data-module="capacitacion" type="button">
-            <span class="module-icon">▤</span>
+          <button class="module-card module-capacitacion" data-module="capacitacion" type="button">
+            <span class="module-icon" aria-hidden="true">▤</span>
             <span class="module-content">
               <strong>Capacitación</strong>
               <small>Contenidos y aprendizaje</small>
             </span>
-            <span class="module-arrow">→</span>
+            <span class="module-meta">1 pendiente</span>
           </button>
 
-          <button class="module-card" data-module="tv" type="button">
-            <span class="module-icon">▶</span>
+          <button class="module-card module-tv" data-module="tv" type="button">
+            <span class="module-icon" aria-hidden="true">▶</span>
             <span class="module-content">
               <strong>TV Comunidad</strong>
               <small>Canales y contenidos audiovisuales</small>
             </span>
-            <span class="module-arrow">→</span>
+            <span class="module-meta live">EN VIVO</span>
           </button>
         </div>
       </section>
 
-      <section class="activity-section" aria-labelledby="activityTitle">
-        <div class="section-heading">
-          <div>
-            <span class="eyebrow">PRÓXIMAMENTE</span>
-            <h2 id="activityTitle">En tu comunidad</h2>
+      <section class="dashboard-grid">
+        <article class="panel agenda-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="eyebrow">AGENDA</span>
+              <h2>Próximas actividades</h2>
+            </div>
+            <button class="text-button" data-module="programacion" type="button">Ver todas</button>
           </div>
-          <button class="text-button" data-module="programacion" type="button">Ver agenda</button>
-        </div>
 
-        <div class="timeline">
-          <article class="event-card">
-            <time datetime="2026-09-03"><strong>03</strong><span>SEP</span></time>
+          <div class="timeline">
+            <button class="event-row" data-module="programacion" type="button">
+              <time datetime="2026-09-03"><strong>03</strong><span>SEP</span></time>
+              <span class="event-info">
+                <small>18:00 · ACTIVIDAD GENERAL</small>
+                <strong>Reunión general</strong>
+                <span>Punto de reunión principal</span>
+              </span>
+              <span class="row-arrow">›</span>
+            </button>
+
+            <button class="event-row" data-module="programacion" type="button">
+              <time datetime="2026-09-06"><strong>06</strong><span>SEP</span></time>
+              <span class="event-info">
+                <small>09:00 · COMUNIDAD</small>
+                <strong>Jornada comunitaria</strong>
+                <span>Área común</span>
+              </span>
+              <span class="row-arrow">›</span>
+            </button>
+
+            <button class="event-row" data-module="programacion" type="button">
+              <time datetime="2026-09-12"><strong>12</strong><span>SEP</span></time>
+              <span class="event-info">
+                <small>17:30 · FORMACIÓN</small>
+                <strong>Sesión informativa</strong>
+                <span>Sala principal</span>
+              </span>
+              <span class="row-arrow">›</span>
+            </button>
+          </div>
+        </article>
+
+        <article class="panel notices-panel">
+          <div class="panel-heading">
             <div>
-              <span class="event-type">Actividad</span>
-              <h3>Reunión general</h3>
-              <p>18:00 · Punto de reunión principal</p>
+              <span class="eyebrow">AVISOS</span>
+              <h2>Para ti</h2>
             </div>
-          </article>
-          <article class="event-card">
-            <time datetime="2026-09-06"><strong>06</strong><span>SEP</span></time>
-            <div>
-              <span class="event-type">Comunidad</span>
-              <h3>Jornada comunitaria</h3>
-              <p>09:00 · Área común</p>
-            </div>
-          </article>
-        </div>
+          </div>
+
+          <button class="notice" data-module="mensajeria" type="button">
+            <span class="notice-dot"></span>
+            <span>
+              <strong>Nuevo mensaje de administración</strong>
+              <small>Hace 18 min</small>
+            </span>
+          </button>
+
+          <button class="notice" data-module="capacitacion" type="button">
+            <span class="notice-dot soft"></span>
+            <span>
+              <strong>Tienes contenido pendiente</strong>
+              <small>Capacitación</small>
+            </span>
+          </button>
+
+          <button class="notice" data-module="programacion" type="button">
+            <span class="notice-dot soft"></span>
+            <span>
+              <strong>Actividad confirmada</strong>
+              <small>3 de septiembre · 18:00</small>
+            </span>
+          </button>
+        </article>
       </section>
+
+      <footer class="app-footer">
+        <span>SCaD Comunidad · v0.2.0</span>
+        <span>Conexión · Organización · Participación</span>
+      </footer>
     </main>
 
     <nav class="bottom-nav" aria-label="Navegación principal">
       <button class="nav-item active" data-route="inicio" type="button"><span>⌂</span><small>Inicio</small></button>
       <button class="nav-item" data-module="programacion" type="button"><span>◷</span><small>Agenda</small></button>
-      <button class="nav-item" data-module="mensajeria" type="button"><span>✉</span><small>Mensajes</small></button>
+      <button class="nav-item" data-module="mensajeria" type="button"><span>✉</span><small>Mensajes</small><b>2</b></button>
       <button class="nav-item" data-route="perfil" type="button"><span>○</span><small>Perfil</small></button>
     </nav>
   </div>
@@ -155,7 +197,7 @@
   <div class="modal-backdrop" id="moduleModal" hidden>
     <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <button class="modal-close" id="modalClose" type="button" aria-label="Cerrar">×</button>
-      <span class="modal-kicker" id="modalKicker">MÓDULO</span>
+      <span class="modal-kicker" id="modalKicker">PROTOTIPO</span>
       <h2 id="modalTitle">Módulo</h2>
       <p id="modalDescription"></p>
       <div id="modalContent" class="modal-content"></div>
