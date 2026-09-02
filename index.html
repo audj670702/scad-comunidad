@@ -41,19 +41,31 @@
     </header>
 
     <main id="inicio">
-      <section class="welcome-card">
-        <div class="welcome-copy">
-          <span class="eyebrow">SCaD COMUNIDAD · v0.2.0</span>
-          <h1>Hola, Usuario.</h1>
-          <p>Todo lo que necesitas de tu comunidad, organizado en un solo lugar.</p>
-        </div>
-        <div class="community-chip">
-          <span class="community-symbol">C</span>
-          <div>
-            <small>Tu comunidad</small>
-            <strong>Comunidad Central</strong>
+      <section class="home-top" aria-label="TV Comunidad">
+        <article class="tv-monitor">
+          <div class="tv-screen" id="tvScreen">
+            <div class="tv-screen-bg"></div>
+            <div class="tv-live-badge"><span></span> EN VIVO</div>
+            <div class="tv-screen-center">
+              <span class="tv-play">▶</span>
+              <strong id="tvScreenTitle">TV Digital Internet</strong>
+              <small id="tvScreenSubtitle">Canal general · 24/7</small>
+            </div>
+            <div class="tv-screen-brand">SCaD Comunidad</div>
           </div>
-        </div>
+          <div class="tv-controls">
+            <div class="tv-channel-control">
+              <span class="tv-label">TV Comunidad</span>
+              <select id="tvChannelSelect" aria-label="Cambiar canal">
+                <option value="tvdi">TV Digital Internet</option>
+                <option value="comunidad">Canal Comunidad</option>
+              </select>
+            </div>
+            <button class="tv-icon-button" id="tvMuteButton" type="button" aria-label="Activar sonido" title="Activar sonido">
+              <span id="tvMuteIcon">🔇</span>
+            </button>
+          </div>
+        </article>
       </section>
 
       <section class="section-block" aria-labelledby="modulesTitle">
@@ -92,13 +104,13 @@
             <span class="module-meta">1 pendiente</span>
           </button>
 
-          <button class="module-card module-tv" data-module="tv" type="button">
-            <span class="module-icon" aria-hidden="true">▶</span>
+          <button class="module-card module-info" data-module="info" type="button">
+            <span class="module-icon" aria-hidden="true">＋</span>
             <span class="module-content">
-              <strong>TV Comunidad</strong>
-              <small>Canales y contenidos audiovisuales</small>
+              <strong>+ Info</strong>
+              <small>Información relevante de tu comunidad</small>
             </span>
-            <span class="module-meta live">EN VIVO</span>
+            <span class="module-meta">Consulta</span>
           </button>
         </div>
       </section>
@@ -181,7 +193,7 @@
       </section>
 
       <footer class="app-footer">
-        <span>SCaD Comunidad · v0.2.0</span>
+        <span>SCaD Comunidad · v0.2.1</span>
         <span>Conexión · Organización · Participación</span>
       </footer>
     </main>
