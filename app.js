@@ -1,64 +1,59 @@
-const modules={
-  programacion:{title:'Programación',description:'Agenda personal de actividades y eventos de la comunidad.',rows:[['Próximas actividades','Agenda cronológica'],['Filtros','Tipo · grupo · categoría'],['Detalle','Información del evento'],['Participación','Confirmaciones y avisos']]},
-  mensajeria:{title:'Mensajería',description:'Centro de comunicación para conversaciones, avisos y mensajes de la comunidad.',rows:[['Usuario ↔ usuario','Conversaciones directas'],['Usuario ↔ administración','Bandeja COM_Panel'],['Sistema → usuario','Avisos automáticos'],['Administración → grupos','Difusión segmentada']]},
-  capacitacion:{title:'Capacitación',description:'Acceso a contenidos formativos habilitados para cada usuario.',rows:[['Mis contenidos','Accesos disponibles'],['Avance','Seguimiento personal'],['Disponibilidad','Según perfil'],['Acceso','Experiencia integrada']]},
-  documentacion:{title:'Documentación',description:'Consulta de documentos publicados para los integrantes de la comunidad.',rows:[['Reglamentos','Normativa vigente'],['Guías','Material de orientación'],['Formatos','Archivos descargables'],['Circulares','Documentos informativos']]}
-};
-
+const VERSION='0.3.0';
+const WIX_CLIENT_ID='8943652e-6424-4b27-961b-9486abcc97b7';
+const WIX_SITE_ID='e9c5ce53-8342-4146-acd9-3468abb10cb0';
+const REDIRECT_URI='https://comunidad.scad.mx/';
+const CONTEXT_URL='https://www.scad.mx/_functions/comPwaContext';
 const TVDI_HLS='https://motortv.scad.mx/hls/canal.m3u8';
-const modal=document.getElementById('moduleModal');
-const modalTitle=document.getElementById('modalTitle');
-const modalDescription=document.getElementById('modalDescription');
-const modalContent=document.getElementById('modalContent');
-const modalClose=document.getElementById('modalClose');
-const identityButton=document.getElementById('identityButton');
-const identityMenu=document.getElementById('identityMenu');
-const installAppButton=document.getElementById('installAppButton');
-const communityInfoButton=document.getElementById('communityInfoButton');
-const tvChannelSelect=document.getElementById('tvChannelSelect');
-const tvMuteButton=document.getElementById('tvMuteButton');
-const tvMuteIcon=document.getElementById('tvMuteIcon');
-const tvFullscreenButton=document.getElementById('tvFullscreenButton');
-const tvScreen=document.getElementById('tvScreen');
-const tvVideo=document.getElementById('tvVideo');
-const tvPlaceholder=document.getElementById('tvPlaceholder');
-const tvScreenCenter=document.getElementById('tvScreenCenter');
-let tvMuted=true;
-let hls=null;
-let deferredInstallPrompt=null;
+const TOKEN_KEY='scad_com_tokens';
+const PKCE_KEY='scad_com_pkce';
 
-function showModal(title,description,html){modalTitle.textContent=title;modalDescription.textContent=description;modalContent.innerHTML=html;modal.hidden=false;document.body.style.overflow='hidden'}
-function openModule(key){const item=modules[key];if(!item)return;showModal(item.title,item.description,`<span class="prototype-chip">Vista demostrativa</span>${item.rows.map(([label,value])=>`<div class="prototype-row"><strong>${label}</strong><span>${value}</span></div>`).join('')}`)}
-function openProfile(){showModal('Mi perfil','Identidad del usuario dentro de SCaD Comunidad.',`<div class="profile-card"><span class="avatar">JD</span><div><strong>Usuario Demo</strong><span>Miembro activo · Comunidad Central</span></div></div><div class="prototype-row"><strong>Rol</strong><span>Miembro</span></div><div class="prototype-row"><strong>Comunidad</strong><span>Comunidad Central</span></div><div class="prototype-row"><strong>Estado</strong><span>Activo</span></div>`)}
-function openCommunityInfo(){showModal('Comunidad Central','Información básica de la comunidad vinculada con tu perfil.',`<div class="prototype-row"><strong>Nombre</strong><span>Comunidad Central</span></div><div class="prototype-row"><strong>Descripción</strong><span>Comunidad de demostración</span></div><div class="prototype-row"><strong>Responsable</strong><span>Administración General</span></div><div class="prototype-row"><strong>Contacto</strong><span>contacto@comunidad.mx</span></div><div class="prototype-row"><strong>Ubicación</strong><span>Configurada en COM_Panel</span></div>`)}
+let context=null,tvMuted=true,hls=null,deferredInstallPrompt=null;
+const $=id=>document.getElementById(id);
+const modal=$('moduleModal'),modalTitle=$('modalTitle'),modalDescription=$('modalDescription'),modalContent=$('modalContent'),identityButton=$('identityButton'),identityMenu=$('identityMenu'),tvVideo=$('tvVideo'),tvPlaceholder=$('tvPlaceholder'),tvScreenCenter=$('tvScreenCenter');
+
+function esc(v=''){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function initials(name=''){return name.trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()||'US'}
+function showModal(title,description='',html=''){modalTitle.textContent=title;modalDescription.textContent=description;modalContent.innerHTML=html;modal.hidden=false;document.body.style.overflow='hidden'}
 function closeModal(){modal.hidden=true;document.body.style.overflow=''}
+function randomString(n=64){const a=new Uint8Array(n);crypto.getRandomValues(a);return Array.from(a,b=>(b%36).toString(36)).join('')}
+function b64url(buf){return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+async function challenge(verifier){return b64url(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(verifier)))}
+function getTokens(){try{return JSON.parse(localStorage.getItem(TOKEN_KEY)||'null')}catch{return null}}
+function saveTokens(t){localStorage.setItem(TOKEN_KEY,JSON.stringify({...t,savedAt:Date.now()}))}
+function clearSession(){localStorage.removeItem(TOKEN_KEY);sessionStorage.removeItem(PKCE_KEY);context=null}
+
+async function tokenRequest(body){const r=await fetch('https://www.wixapis.com/oauth2/token',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(!r.ok)throw new Error(`OAuth token ${r.status}`);return r.json()}
+async function anonymousToken(){return tokenRequest({clientId:WIX_CLIENT_ID,grantType:'anonymous'})}
+async function refreshTokens(refreshToken){const t=await tokenRequest({clientId:WIX_CLIENT_ID,grantType:'refresh_token',refreshToken});saveTokens(t);return t}
+async function startLogin(){const verifier=randomString(72),state=randomString(32),codeChallenge=await challenge(verifier);sessionStorage.setItem(PKCE_KEY,JSON.stringify({verifier,state}));const anon=await anonymousToken();const r=await fetch('https://www.wixapis.com/headless/v1/redirect-session',{method:'POST',headers:{'Content-Type':'application/json','Authorization':anon.access_token},body:JSON.stringify({auth:{authRequest:{clientId:WIX_CLIENT_ID,responseType:'code',redirectUri:REDIRECT_URI,scope:'offline_access',state,responseMode:'query',codeChallenge,codeChallengeMethod:'S256',metaSiteId:WIX_SITE_ID},prompt:'login'},preferences:{useGenericWixPages:true}})});if(!r.ok)throw new Error(`OAuth redirect ${r.status}`);const data=await r.json();const url=data?.redirectSession?.fullUrl;if(!url)throw new Error('Wix no devolvió URL de autenticación');location.assign(url)}
+async function consumeCallback(){const p=new URLSearchParams(location.search),code=p.get('code'),error=p.get('error');if(error)throw new Error(`Autenticación Wix: ${error}`);if(!code)return false;const raw=sessionStorage.getItem(PKCE_KEY);if(!raw)throw new Error('No existe contexto PKCE');const pkce=JSON.parse(raw);if(p.get('state')!==pkce.state)throw new Error('Estado OAuth inválido');const t=await tokenRequest({clientId:WIX_CLIENT_ID,grantType:'authorization_code',redirectUri:REDIRECT_URI,code,codeVerifier:pkce.verifier});saveTokens(t);sessionStorage.removeItem(PKCE_KEY);history.replaceState({},document.title,REDIRECT_URI);return true}
+async function accessToken(){let t=getTokens();if(!t)return null;const age=(Date.now()-(t.savedAt||0))/1000;if(t.access_token&&age<Math.max(60,(t.expires_in||3600)-120))return t.access_token;if(t.refresh_token){t=await refreshTokens(t.refresh_token);return t.access_token}return null}
+async function loadContext(){const token=await accessToken();if(!token)return null;let r=await fetch(CONTEXT_URL,{headers:{Authorization:token,'Cache-Control':'no-cache'}});if(r.status===401||r.status===403){const t=getTokens();if(t?.refresh_token){const fresh=await refreshTokens(t.refresh_token);r=await fetch(CONTEXT_URL,{headers:{Authorization:fresh.access_token,'Cache-Control':'no-cache'}})}}const data=await r.json().catch(()=>({ok:false,mensaje:`HTTP ${r.status}`}));if(!r.ok||!data.ok)throw new Error(data.mensaje||`Contexto COM ${r.status}`);return data}
+
+function renderIdentity(){const u=context.usuario,e=context.eo,name=u.nombreVisible||u.nombre||'Usuario',ini=initials(name);['identityAvatar','menuAvatar'].forEach(id=>$(id).textContent=ini);$('identityName').textContent=name;$('menuName').textContent=name;$('identityEO').textContent=e.nombreVisible||e.nombre;$('menuStatus').textContent='Miembro activo';$('communityName').textContent=e.nombreVisible||e.nombre;$('communityStatus').textContent='Miembro activo';$('communityLogo').textContent=initials(e.nombreVisible||e.nombre);}
+function formatActivity(a){const d=new Date(a.inicio),day=String(d.getDate()).padStart(2,'0'),month=d.toLocaleDateString('es-MX',{month:'short'}).replace('.','').toUpperCase(),time=a.todoElDia?'TODO EL DÍA':d.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});return `<button class="event-row" data-activity="${esc(a.id)}" type="button"><time><strong>${day}</strong><span>${esc(month)}</span></time><span class="event-info"><small>${esc(time)} · ${esc(a.tipoActividad||'ACTIVIDAD')}</small><strong>${esc(a.titulo)}</strong><span>${esc(a.ubicacion||'')}</span></span><span class="row-arrow">›</span></button>`}
+function renderAgenda(){const list=context.actividades||[];$('programacionMeta').textContent=list.length?`${list.length} próximas`:'Sin próximas';$('agendaTimeline').innerHTML=list.length?list.slice(0,3).map(formatActivity).join(''):'<div class="prototype-row"><strong>No hay próximas actividades.</strong></div>';$('agendaTimeline').querySelectorAll('[data-activity]').forEach(b=>b.onclick=()=>openActivity(list.find(x=>x.id===b.dataset.activity)))}
+function renderStatus(){const docs=context.documentos||[];$('documentacionMeta').textContent=docs.length?`${docs.length} disponibles`:'Sin documentos';$('statusPanel').innerHTML=`<div class="prototype-row"><strong>Acceso</strong><span>Activo</span></div><div class="prototype-row"><strong>Comunidad</strong><span>${esc(context.eo.nombreVisible||context.eo.nombre)}</span></div><div class="prototype-row"><strong>Documentos</strong><span>${docs.length}</span></div>`}
+function renderContext(){renderIdentity();renderAgenda();renderStatus();if($('tvChannelSelect').value==='comunidad')playCommunity()}
+
+function openActivity(a){if(!a)return;showModal(a.titulo,a.descripcion||'',`<div class="prototype-row"><strong>Inicio</strong><span>${new Date(a.inicio).toLocaleString('es-MX')}</span></div>${a.ubicacion?`<div class="prototype-row"><strong>Lugar</strong><span>${esc(a.ubicacion)}</span></div>`:''}${a.enlace?`<a class="prototype-row" href="${esc(a.enlace)}" target="_blank" rel="noopener"><strong>Abrir enlace</strong><span>↗</span></a>`:''}`)}
+function openProgramacion(){const list=context?.actividades||[];showModal('Programación','Actividades y eventos de tu comunidad.',list.length?list.map(a=>`<div class="prototype-row"><strong>${esc(a.titulo)}</strong><span>${new Date(a.inicio).toLocaleString('es-MX')}</span></div>`).join(''):'<div class="prototype-row"><strong>No hay actividades próximas.</strong></div>')}
+function openDocumentos(){const list=context?.documentos||[];showModal('Documentación','Documentos disponibles para tu perfil.',list.length?list.map(d=>`<a class="prototype-row" href="${esc(d.documentoUrl)}" target="_blank" rel="noopener"><strong>${esc(d.titulo)}</strong><span>${esc(d.categoria||d.nombreArchivo||'Abrir')} ↗</span></a>`).join(''):'<div class="prototype-row"><strong>No hay documentos disponibles.</strong></div>')}
+function openProfile(){const u=context?.usuario,e=context?.eo;if(!u)return;showModal('Mi perfil','Identidad operativa en SCaD Comunidad.',`<div class="profile-card"><span class="avatar">${initials(u.nombreVisible||u.nombre)}</span><div><strong>${esc(u.nombreVisible||u.nombre)}</strong><span>${esc(u.email||'')}</span></div></div><div class="prototype-row"><strong>Comunidad</strong><span>${esc(e.nombreVisible||e.nombre)}</span></div><div class="prototype-row"><strong>Estado</strong><span>Activo</span></div>`)}
+function openCommunityInfo(){const e=context?.eo;if(!e)return;showModal(e.nombreVisible||e.nombre,'Comunidad vinculada con tu perfil.',`<div class="prototype-row"><strong>Código</strong><span>${esc(e.codigoEO||'')}</span></div><div class="prototype-row"><strong>Estado</strong><span>Activa</span></div>`)}
+function openModule(key){if(!context)return;if(key==='programacion')return openProgramacion();if(key==='documentacion')return openDocumentos();if(key==='mensajeria')return showModal('Mensajería','La identidad COM ya está conectada. La interfaz MNS para PWA se integra en la siguiente etapa.','<div class="prototype-row"><strong>Estado</strong><span>Contexto de usuario validado</span></div>');showModal('Capacitación','Este módulo todavía no tiene una fuente operativa definida para COM.','<div class="prototype-row"><strong>Estado</strong><span>Pendiente de integración</span></div>')}
 
 function destroyHls(){if(hls){hls.destroy();hls=null}tvVideo.pause();tvVideo.removeAttribute('src');tvVideo.load()}
 function setPlaceholder(active){tvPlaceholder.hidden=!active;tvScreenCenter.hidden=!active;tvVideo.hidden=active}
-function playTvdi(){destroyHls();setPlaceholder(false);tvVideo.muted=tvMuted;if(tvVideo.canPlayType('application/vnd.apple.mpegurl')){tvVideo.src=TVDI_HLS;tvVideo.play().catch(()=>{});return}if(window.Hls&&Hls.isSupported()){hls=new Hls({enableWorker:true,lowLatencyMode:false,backBufferLength:30});hls.loadSource(TVDI_HLS);hls.attachMedia(tvVideo);hls.on(Hls.Events.MANIFEST_PARSED,()=>tvVideo.play().catch(()=>{}));hls.on(Hls.Events.ERROR,(_,data)=>{if(data.fatal)setPlaceholder(true)});return}setPlaceholder(true)}
-function setTvChannel(channel){tvScreen.dataset.channel=channel;if(channel==='tvdi'){playTvdi()}else{destroyHls();setPlaceholder(true)}}
-function toggleTvMute(){tvMuted=!tvMuted;tvVideo.muted=tvMuted;tvMuteIcon.textContent=tvMuted?'🔇':'🔊';tvMuteButton.setAttribute('aria-label',tvMuted?'Activar sonido':'Silenciar');tvMuteButton.setAttribute('title',tvMuted?'Activar sonido':'Silenciar');if(!tvMuted)tvVideo.play().catch(()=>{})}
-async function toggleFullscreen(){try{if(!document.fullscreenElement){await tvScreen.requestFullscreen()}else{await document.exitFullscreen()}}catch(e){}}
+function playUrl(url){destroyHls();if(!url){setPlaceholder(true);return}setPlaceholder(false);tvVideo.muted=tvMuted;if(/\.m3u8($|\?)/i.test(url)){if(tvVideo.canPlayType('application/vnd.apple.mpegurl')){tvVideo.src=url;tvVideo.play().catch(()=>{});return}if(window.Hls&&Hls.isSupported()){hls=new Hls({enableWorker:true,lowLatencyMode:false,backBufferLength:30});hls.loadSource(url);hls.attachMedia(tvVideo);hls.on(Hls.Events.MANIFEST_PARSED,()=>tvVideo.play().catch(()=>{}));hls.on(Hls.Events.ERROR,(_,d)=>{if(d.fatal)setPlaceholder(true)});return}}tvVideo.src=url;tvVideo.play().catch(()=>{})}
+function playCommunity(){const tv=context?.tv;if(!tv?.youtubeId){setPlaceholder(true);return}destroyHls();setPlaceholder(false);tvVideo.hidden=true;tvPlaceholder.hidden=false;tvScreenCenter.hidden=false;tvScreenCenter.innerHTML=`<a href="${esc(tv.youtubeUrl||`https://www.youtube.com/watch?v=${tv.youtubeId}`)}" target="_blank" rel="noopener" class="tv-play">▶</a>`}
+function setTvChannel(ch){$('tvScreen').dataset.channel=ch;if(ch==='tvdi')playUrl(TVDI_HLS);else playCommunity()}
 
-function isInstalled(){return window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true}
-function setInstalledState(){installAppButton.textContent='App instalada';installAppButton.classList.add('installed');installAppButton.disabled=true}
-if(isInstalled())setInstalledState();
-window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();deferredInstallPrompt=event;if(!isInstalled()){installAppButton.textContent='Instalar app';installAppButton.classList.remove('installed');installAppButton.disabled=false}});
-window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;setInstalledState()});
-installAppButton.addEventListener('click',async()=>{if(isInstalled()){setInstalledState();return}if(deferredInstallPrompt){deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;return}showModal('Instalar app','La instalación depende del navegador y del dispositivo.',`<div class="prototype-row"><strong>Chrome / Android</strong><span>Usa la opción Instalar aplicación del navegador.</span></div><div class="prototype-row"><strong>Safari / iPhone</strong><span>Compartir → Añadir a pantalla de inicio.</span></div>`) });
+async function logout(){clearSession();try{const anon=await anonymousToken();const r=await fetch('https://www.wixapis.com/headless/v1/redirect-session',{method:'POST',headers:{'Content-Type':'application/json',Authorization:anon.access_token},body:JSON.stringify({logout:{clientId:WIX_CLIENT_ID},callbacks:{postFlowUrl:REDIRECT_URI}})});const d=await r.json();if(d?.redirectSession?.fullUrl){location.assign(d.redirectSession.fullUrl);return}}catch{}location.replace(REDIRECT_URI)}
+function showAuthError(err){$('communityStatus').textContent='Acceso no disponible';$('agendaTimeline').innerHTML='<div class="prototype-row"><strong>No fue posible cargar la agenda.</strong></div>';$('statusPanel').innerHTML=`<div class="prototype-row"><strong>Acceso</strong><span>${esc(err.message||String(err))}</span></div>`;showModal('Acceso a SCaD Comunidad','No fue posible validar tu sesión.',`<div class="prototype-row"><strong>Detalle</strong><span>${esc(err.message||String(err))}</span></div><button class="install-button" id="retryLogin" type="button">Iniciar sesión</button>`);setTimeout(()=>{const b=$('retryLogin');if(b)b.onclick=()=>startLogin().catch(showAuthError)},0)}
 
-document.querySelectorAll('[data-module]').forEach(button=>button.addEventListener('click',()=>openModule(button.dataset.module)));
-document.querySelectorAll('[data-route="perfil"]').forEach(button=>button.addEventListener('click',()=>{identityMenu.hidden=true;identityButton.setAttribute('aria-expanded','false');openProfile()}));
-document.querySelectorAll('[data-route="inicio"]').forEach(button=>button.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'})));
-communityInfoButton.addEventListener('click',openCommunityInfo);
-modalClose.addEventListener('click',closeModal);
-modal.addEventListener('click',event=>{if(event.target===modal)closeModal()});
-document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!modal.hidden)closeModal()});
-identityButton.addEventListener('click',event=>{event.stopPropagation();const shouldOpen=identityMenu.hidden;identityMenu.hidden=!shouldOpen;identityButton.setAttribute('aria-expanded',String(shouldOpen))});
-identityMenu.addEventListener('click',event=>event.stopPropagation());
-document.addEventListener('click',()=>{identityMenu.hidden=true;identityButton.setAttribute('aria-expanded','false')});
-tvChannelSelect.addEventListener('change',event=>setTvChannel(event.target.value));
-tvMuteButton.addEventListener('click',toggleTvMute);
-tvFullscreenButton.addEventListener('click',toggleFullscreen);
-setTvChannel(tvChannelSelect.value);
-if('serviceWorker'in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}))}
+function wireUI(){$('modalClose').onclick=closeModal;modal.onclick=e=>{if(e.target===modal)closeModal()};document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)closeModal()});identityButton.onclick=e=>{e.stopPropagation();identityMenu.hidden=!identityMenu.hidden};identityMenu.onclick=e=>e.stopPropagation();document.addEventListener('click',()=>identityMenu.hidden=true);document.querySelectorAll('[data-route="perfil"]').forEach(b=>b.onclick=()=>openProfile());document.querySelectorAll('[data-route="inicio"]').forEach(b=>b.onclick=()=>scrollTo({top:0,behavior:'smooth'}));document.querySelectorAll('[data-module]').forEach(b=>b.onclick=()=>openModule(b.dataset.module));$('communityInfoButton').onclick=openCommunityInfo;$('logoutButton').onclick=logout;$('tvChannelSelect').onchange=e=>setTvChannel(e.target.value);$('tvMuteButton').onclick=()=>{tvMuted=!tvMuted;tvVideo.muted=tvMuted;$('tvMuteIcon').textContent=tvMuted?'🔇':'🔊';if(!tvMuted)tvVideo.play().catch(()=>{})};$('tvFullscreenButton').onclick=async()=>{try{if(!document.fullscreenElement)await $('tvScreen').requestFullscreen();else await document.exitFullscreen()}catch{}}}
+function setupInstall(){const b=$('installAppButton');const installed=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;const set=()=>{b.textContent='App instalada';b.disabled=true;b.classList.add('installed')};if(installed())set();addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;if(!installed()){b.textContent='Instalar app';b.disabled=false}});addEventListener('appinstalled',set);b.onclick=async()=>{if(deferredInstallPrompt){deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null}}}
+
+async function boot(){wireUI();setupInstall();setTvChannel('tvdi');try{await consumeCallback();let token=await accessToken();if(!token){await startLogin();return}context=await loadContext();renderContext()}catch(e){console.error('[SCaD COM]',e);showAuthError(e)}if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(console.error))}
+boot();
