@@ -1,6 +1,7 @@
-const VERSION='0.3.3';
+const VERSION='0.3.4';
 const AUTH_URL='https://www.scad.mx/com-autenticacion';
 const CONTEXT_URL='https://www.scad.mx/_functions/comPwaContext';
+const MIS_CURSOS_URL='https://www.scad.mx/mis-cursos';
 const TVDI_HLS='https://motortv.scad.mx/hls/canal.m3u8';
 const MEMBER_KEY='scad_com_member_id';
 
@@ -15,6 +16,7 @@ function closeModal(){modal.hidden=true;document.body.style.overflow=''}
 function getMemberId(){const p=new URLSearchParams(location.search);const incoming=String(p.get('memberId')||'').trim();if(incoming){localStorage.setItem(MEMBER_KEY,incoming);history.replaceState({},document.title,location.pathname);return incoming}return String(localStorage.getItem(MEMBER_KEY)||'').trim()}
 function clearSession(){localStorage.removeItem(MEMBER_KEY);context=null}
 function startLogin(){location.assign(AUTH_URL)}
+function openMisCursos(){const u=new URL(MIS_CURSOS_URL);u.searchParams.set('target','mis-cursos');u.searchParams.set('from','pwa');u.searchParams.set('t',String(Date.now()));u.searchParams.set('mensaje',location.href);location.assign(u.toString())}
 
 async function loadContext(memberId){if(!memberId)return null;const url=`${CONTEXT_URL}?memberId=${encodeURIComponent(memberId)}`;const r=await fetch(url,{cache:'no-store'});const data=await r.json().catch(()=>({ok:false,mensaje:`HTTP ${r.status}`}));if(!r.ok||!data.ok)throw new Error(data.mensaje||`Contexto COM ${r.status}`);return data}
 
@@ -29,7 +31,7 @@ function openProgramacion(){const list=context?.actividades||[];showModal('Progr
 function openDocumentos(){const list=context?.documentos||[];showModal('Documentación','',list.length?list.map(d=>`<a class="prototype-row" href="${esc(d.documentoUrl)}" target="_blank" rel="noopener"><strong>${esc(d.titulo)}</strong><span>${esc(d.categoria||d.nombreArchivo||'Abrir')} ↗</span></a>`).join(''):'<div class="prototype-row"><strong>No hay documentos disponibles.</strong></div>')}
 function openProfile(){const u=context?.usuario,e=context?.eo;if(!u)return;showModal('Mi perfil','',`<div class="profile-card"><span class="avatar">${initials(u.nombreVisible||u.nombre)}</span><div><strong>${esc(u.nombreVisible||u.nombre)}</strong><span>${esc(u.email||'')}</span></div></div><div class="prototype-row"><strong>Comunidad</strong><span>${esc(e.nombreVisible||e.nombre)}</span></div><div class="prototype-row"><strong>Roles</strong><span>${esc((u.roles||[]).join(' · '))}</span></div><div class="prototype-row"><strong>Estado</strong><span>Activo</span></div>`)}
 function openCommunityInfo(){const e=context?.eo;if(!e)return;showModal(e.nombreVisible||e.nombre,'',`<div class="prototype-row"><strong>Código</strong><span>${esc(e.codigoEO||'')}</span></div><div class="prototype-row"><strong>Estado</strong><span>Activa</span></div>`)}
-function openModule(key){if(!context)return;if(key==='programacion')return openProgramacion();if(key==='documentacion')return openDocumentos();if(key==='mensajeria')return showModal('Mensajería','MNS se integrará sobre el contexto APP + EO ya autenticado.','<div class="prototype-row"><strong>Estado</strong><span>Pendiente de interfaz MNS</span></div>');showModal('Capacitación','', '<div class="prototype-row"><strong>Estado</strong><span>Pendiente de integración</span></div>')}
+function openModule(key){if(!context)return;if(key==='programacion')return openProgramacion();if(key==='documentacion')return openDocumentos();if(key==='capacitacion')return openMisCursos();if(key==='mensajeria')return showModal('Mensajería','MNS se integrará sobre el contexto APP + EO ya autenticado.','<div class="prototype-row"><strong>Estado</strong><span>Pendiente de interfaz MNS</span></div>')}
 
 function destroyHls(){if(hls){hls.destroy();hls=null}tvVideo.pause();tvVideo.removeAttribute('src');tvVideo.load()}
 function setPlaceholder(active){tvPlaceholder.hidden=!active;tvScreenCenter.hidden=!active;tvVideo.hidden=active}
