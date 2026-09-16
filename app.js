@@ -1,4 +1,4 @@
-const VERSION='0.3.0';
+const VERSION='0.3.1';
 const WIX_CLIENT_ID='8943652e-6424-4b27-961b-9486abcc97b7';
 const WIX_SITE_ID='e9c5ce53-8342-4146-acd9-3468abb10cb0';
 const REDIRECT_URI='https://comunidad.scad.mx/';
