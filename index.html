@@ -37,9 +37,9 @@
       <section class="home-top" aria-label="Inicio de comunidad">
         <div class="home-label home-label-community">Mi comunidad</div>
         <label class="home-channel-selector"><span>Canal</span><select id="tvChannelSelect" aria-label="Cambiar canal"><option value="tvdi">TV Digital Internet</option><option value="comunidad">Canal Comunidad</option></select></label>
-        <article class="community-card"><div class="community-logo" id="communityLogo">SC</div><div class="community-card-copy"><strong id="communityName">SCaD Comunidad</strong></div></article>
+        <article class="community-card"><div class="community-logo" id="communityLogo">SC</div><div class="community-card-copy"><strong id="communityName">SCaD Comunidad</strong><button class="community-info-button" id="communityInfoButton" type="button">+ Info</button></div></article>
         <article class="tv-monitor"><div class="tv-controls"><button class="tv-icon-button" id="tvMuteButton" type="button" aria-label="Activar sonido" title="Activar sonido"><span id="tvMuteIcon">🔇</span></button><button class="tv-icon-button tv-fullscreen-button" id="tvFullscreenButton" type="button" aria-label="Ampliar monitor a pantalla completa" title="Ampliar monitor"><span aria-hidden="true">⛶</span></button></div><div class="tv-screen" id="tvScreen"><video id="tvVideo" autoplay muted playsinline preload="auto" aria-label="Canal en vivo"></video><div class="tv-screen-bg" id="tvPlaceholder"></div><div class="tv-screen-center" id="tvScreenCenter"><span class="tv-play">▶</span></div></div></article>
-        <div class="community-subline"><button class="community-info-button" id="communityInfoButton" type="button">+ Info</button></div>
+        <div class="community-subline"></div>
       </section>
 
       <section class="section-block" aria-label="Módulos disponibles"><div class="module-grid">
@@ -53,7 +53,7 @@
         <article class="panel agenda-panel"><div class="panel-heading"><div><span class="eyebrow">AGENDA</span><h2>Próximas actividades</h2></div><button class="text-button" data-module="programacion" type="button">Ver todas</button></div><div class="timeline" id="agendaTimeline"><div class="prototype-row"><strong>Cargando agenda…</strong></div></div></article>
         <article class="panel notices-panel"><div class="panel-heading"><div><span class="eyebrow">ESTADO</span><h2>Tu comunidad</h2></div></div><div id="statusPanel"><div class="prototype-row"><strong>Conectando con SCaD…</strong></div></div></article>
       </section>
-      <footer class="app-footer"><span>SCaD Comunidad · v0.3.11</span><span>Conexión · Organización · Participación</span></footer>
+      <footer class="app-footer"><span>SCaD Comunidad · v0.3.12</span><span>Conexión · Organización · Participación</span></footer>
     </main>
 
     <nav class="bottom-nav" aria-label="Navegación principal"><button class="nav-item active" data-route="inicio" type="button"><span>⌂</span><small>Inicio</small></button><button class="nav-item" data-module="programacion" type="button"><span>◷</span><small>Agenda</small></button><button class="nav-item" data-module="mensajeria" type="button"><span>✉</span><small>Mensajes</small></button><button class="nav-item" data-route="perfil" type="button"><span>○</span><small>Perfil</small></button></nav>
