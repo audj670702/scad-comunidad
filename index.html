@@ -10,6 +10,7 @@
   <link rel="apple-touch-icon" href="img/icon_scad_comunidad_192.png" />
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="install.css" />
 </head>
 <body>
   <div class="app-shell">
@@ -50,13 +51,26 @@
         <article class="panel agenda-panel"><div class="panel-heading"><div><span class="eyebrow">AGENDA</span><h2>Próximas actividades</h2></div><button class="text-button" data-module="programacion" type="button">Ver todas</button></div><div class="timeline" id="agendaTimeline"><div class="prototype-row"><strong>Cargando agenda…</strong></div></div></article>
         <article class="panel notices-panel"><div class="panel-heading"><div><span class="eyebrow">ESTADO</span><h2>Tu comunidad</h2></div></div><div id="statusPanel"><div class="prototype-row"><strong>Conectando con SCaD…</strong></div></div></article>
       </section>
-      <footer class="app-footer"><span>SCaD Comunidad · v0.3.6</span><span>Conexión · Organización · Participación</span></footer>
+      <footer class="app-footer"><span>SCaD Comunidad · v0.3.7</span><span>Conexión · Organización · Participación</span></footer>
     </main>
 
     <nav class="bottom-nav" aria-label="Navegación principal"><button class="nav-item active" data-route="inicio" type="button"><span>⌂</span><small>Inicio</small></button><button class="nav-item" data-module="programacion" type="button"><span>◷</span><small>Agenda</small></button><button class="nav-item" data-module="mensajeria" type="button"><span>✉</span><small>Mensajes</small></button><button class="nav-item" data-route="perfil" type="button"><span>○</span><small>Perfil</small></button></nav>
   </div>
 
   <div class="modal-backdrop" id="moduleModal" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><button class="modal-close" id="modalClose" type="button" aria-label="Cerrar">×</button><span class="modal-kicker" id="modalKicker">SCaD COMUNIDAD</span><h2 id="modalTitle">Módulo</h2><p id="modalDescription"></p><div id="modalContent" class="modal-content"></div></section></div>
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script><script src="app.js"></script>
+
+  <div class="ios-tutorial-backdrop" id="iosTutorialModal" hidden>
+    <section class="ios-tutorial-dialog" role="dialog" aria-modal="true" aria-labelledby="iosTutorialTitle">
+      <button class="ios-tutorial-close" id="iosTutorialClose" type="button" aria-label="Cerrar">×</button>
+      <h2 id="iosTutorialTitle">Instalar SCaD Comunidad en iPhone</h2>
+      <video class="ios-tutorial-video" id="iosTutorialVideo" controls playsinline preload="metadata">
+        <source src="img/iphone-install.mp4" type="video/mp4" />
+      </video>
+    </section>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
+  <script src="app.js"></script>
+  <script src="install.js"></script>
 </body>
 </html>
