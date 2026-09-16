@@ -1,0 +1,21 @@
+/* SCaD Comunidad · acceso Panel ADM · v0.3.8 */
+.identity-menu .admin-panel-link{
+  margin:4px 0;
+  padding-top:9px;
+  padding-bottom:9px;
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  color:var(--muted);
+  font-size:.7rem;
+  font-weight:700;
+}
+.identity-menu .admin-panel-link span{
+  display:inline-block;
+  margin-right:7px;
+  font-size:.82rem;
+  color:var(--navy);
+}
+.identity-menu .admin-panel-link:hover{
+  color:var(--navy);
+  background:var(--surface-2);
+}
