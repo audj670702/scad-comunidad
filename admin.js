@@ -1,4 +1,6 @@
 // SCaD Comunidad · acceso Panel ADM · v0.3.9
+import('./com-mns.js').catch(error => console.error('[SCaD COM MNS LOAD]', error));
+
 (() => {
   const ADM_SYS_MEMBER_ID = '41c765a8-b156-4954-ba1f-a98e7a188a8e';
   const PANEL_URL = 'https://www.scad.mx/com-panel';
