@@ -1,3 +1,6 @@
+import { createClient, OAuthStrategy } from 'https://esm.sh/@wix/sdk';
+import { functions } from 'https://esm.sh/@wix/http-functions@1.0.0';
+
 const CHANNEL='MNS_FRONTEND';
 const FRAME_URL='mns-frontend-v052.html?v=0.5.9';
 const CLIENT_ID='8943652e-6424-4b27-961b-9486abcc97b7';
@@ -8,7 +11,6 @@ const PKCE_KEY='scad_com_mns_pkce';
 const PENDING_KEY='scad_com_mns_pending';
 const MEMBER_KEY='scad_com_member_id';
 const CONTEXT_URL='https://www.scad.mx/_functions/comPwaContext';
-const MNS_BRIDGE_URL='https://www.scad.mx/_functions/mnsBridge';
 const MNS_KEY='MNS-2RYC2USGM32F';
 const MNS_EO_KEY_BY_COMMUNITY=Object.freeze({'BOYS SCOUTS':'EO-002'});
 let activeContext=null;
@@ -31,7 +33,7 @@ function resolveMnsContext(ctx){const community=String(ctx?.eo?.nombreVisible||c
 function ensureStyles(){if(document.getElementById('comMnsStyles'))return;const s=document.createElement('style');s.id='comMnsStyles';s.textContent=`.com-mns-overlay{position:fixed;inset:0;z-index:99999;background:rgba(11,28,47,.46);display:flex;align-items:stretch;justify-content:center}.com-mns-panel{width:100%;height:100%;background:#f6f8fb;overflow:hidden}.com-mns-frame{display:block;width:100%;height:100%;border:0;background:#f6f8fb}body.com-mns-open{overflow:hidden}@media(min-width:760px){.com-mns-overlay{padding:28px;align-items:center}.com-mns-panel{width:min(1040px,calc(100vw - 56px));height:min(820px,calc(100dvh - 56px));border-radius:22px;box-shadow:0 24px 80px rgba(6,31,57,.28)}}`;document.head.appendChild(s)}
 function frame(){return document.querySelector('#comMnsOverlay iframe')}
 function closeMns(){document.getElementById('comMnsOverlay')?.remove();document.body.classList.remove('com-mns-open')}
-async function invokeMns(action,payload={}){const token=await accessToken();if(!token)throw new Error('Inicia sesión para usar Mensajería.');const ctx=resolveMnsContext(activeContext);const response=await fetch(MNS_BRIDGE_URL,{method:'POST',cache:'no-store',headers:{Authorization:token,'Content-Type':'application/json'},body:JSON.stringify({action,payload:{...payload,...ctx}})});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data?.error||`MNS no respondió (${response.status}).`);if(data?.ok!==true)throw new Error(data?.error||'No fue posible completar la operación.');return data.data}
+async function invokeMns(action,payload={}){const token=await accessToken();if(!token)throw new Error('Inicia sesión para usar Mensajería.');const tokens=readTokens();const client=createClient({modules:{functions},auth:OAuthStrategy({clientId:CLIENT_ID,tokens})});const ctx=resolveMnsContext(activeContext);const response=await client.functions.post('mnsBridge',{headers:{'Content-Type':'application/json'},body:JSON.stringify({action,payload:{...payload,...ctx}})});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data?.error||`MNS no respondió (${response.status}).`);if(data?.ok!==true)throw new Error(data?.error||'No fue posible completar la operación.');return data.data}
 async function openMns(ctx=null){try{activeContext=ctx||await loadComContext();if(!await accessToken()){await startMnsLogin();return}resolveMnsContext(activeContext);ensureStyles();closeMns();const overlay=document.createElement('div');overlay.id='comMnsOverlay';overlay.className='com-mns-overlay';overlay.innerHTML=`<div class="com-mns-panel" role="dialog" aria-modal="true" aria-label="Mensajería"><iframe class="com-mns-frame" src="${FRAME_URL}" title="Mensajería SCaD MNS"></iframe></div>`;overlay.addEventListener('click',e=>{if(e.target===overlay)closeMns()});document.body.appendChild(overlay);document.body.classList.add('com-mns-open')}catch(error){console.error('[SCaD COM MNS]',error);window.alert(error?.message||'No fue posible abrir Mensajería.')}}
 window.openScadMns=openMns;
 
