@@ -1,4 +1,4 @@
-const CACHE='scad-comunidad-v0.3.14';
+const CACHE='scad-comunidad-v0.3.12-mns2';
 const ASSETS=['./','./index.html','./styles.css','./install.css','./admin.css','./app.js','./install.js','./admin.js','./com-mns.js','./mns-frontend-v052.html','./mns-frontend.html','./manifest.json','./img/logo_scad_comunidad.png','./img/icon_scad_comunidad_192.png','./img/icon_scad_comunidad_512.png','./img/scad_comunidad_favicon.png'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)));self.skipWaiting()});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))));self.clients.claim()});
