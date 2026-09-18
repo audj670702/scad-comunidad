@@ -1,4 +1,4 @@
-const VERSION='0.3.17';
+const VERSION='0.3.18';
 const AUTH_URL='https://www.scad.mx/com-autenticacion';
 const CONTEXT_URL='https://www.scad.mx/_functions/comPwaContext';
 const MIS_CURSOS_URL='https://www.scad.mx/mis-cursos';
