@@ -1,4 +1,4 @@
-const VERSION='0.3.19';
+const VERSION='0.3.20';
 const AUTH_URL='https://www.scad.mx/com-autenticacion';
 const CONTEXT_URL='https://www.scad.mx/_functions/comPwaContext';
 const MIS_CURSOS_URL='https://www.scad.mx/mis-cursos';
@@ -38,7 +38,9 @@ function getNewActivities(){const seen=getSeenActivityIds();return (context?.act
 function renderProgramacionBadge(){const badge=$('programacionNewCount');if(!badge)return;const count=getNewActivities().length;badge.hidden=!count;badge.textContent=count>99?'99+':String(count);badge.setAttribute('aria-label',count+' actividades nuevas')}
 function markProgramacionSeen(){const ids=(context?.actividades||[]).map(a=>String(a.id||'')).filter(Boolean);localStorage.setItem(PROGRAMACION_SEEN_KEY,JSON.stringify(ids));renderProgramacionBadge()}
 function renderAgenda(){const list=context.actividades||[];$('agendaTimeline').innerHTML=list.length?list.slice(0,3).map(formatActivity).join(''):'<div class="prototype-row"><strong>No hay próximas actividades.</strong></div>';$('agendaTimeline').querySelectorAll('[data-activity]').forEach(b=>b.onclick=()=>openActivity(list.find(x=>x.id===b.dataset.activity)));renderProgramacionBadge()}
-function renderContext(){document.querySelectorAll('[data-module],.bottom-nav .nav-item').forEach(b=>{b.disabled=false;b.removeAttribute('aria-disabled')});renderIdentity();renderAgenda();if($('tvChannelSelect').value==='comunidad')playCommunity()}
+function authBit(v){return v===true||v===1||v==='1'?'1':v===false||v===0||v==='0'?'0':'?'}
+function renderAuthChain(){const el=$('authChain');if(!el)return;const a=context?.auth||{};el.textContent='Se'+authBit(a.Se)+' · Eo'+authBit(a.Eo)+' · Us'+authBit(a.Us)+' · Pr'+authBit(a.Pr)+' · Co'+authBit(a.Co)+' · Ad'+authBit(a.Ad)}
+function renderContext(){document.querySelectorAll('[data-module],.bottom-nav .nav-item').forEach(b=>{b.disabled=false;b.removeAttribute('aria-disabled')});renderIdentity();renderAgenda();renderAuthChain();if($('tvChannelSelect').value==='comunidad')playCommunity()}
 
 function openActivity(a){if(!a)return;showModal(a.titulo,a.descripcion||'',`<div class="prototype-row"><strong>Inicio</strong><span>${new Date(a.inicio).toLocaleString('es-MX')}</span></div>${a.fin?`<div class="prototype-row"><strong>Término</strong><span>${new Date(a.fin).toLocaleString('es-MX')}</span></div>`:''}${a.ubicacion?`<div class="prototype-row"><strong>Lugar</strong><span>${esc(a.ubicacion)}</span></div>`:''}${a.enlace?`<a class="prototype-row" href="${esc(a.enlace)}" target="_blank" rel="noopener"><strong>Abrir enlace</strong><span>↗</span></a>`:''}`)}
 function activityDayKey(value){const d=new Date(value);return Number.isNaN(d.getTime())?'':d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
