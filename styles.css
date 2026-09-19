@@ -20,3 +20,7 @@ main{width:min(1180px,100%);margin:0 auto;padding:18px clamp(14px,4vw,34px) 34px
 
 /* Diagnóstico autenticación · v0.3.20 */
 .auth-chain{font-size:.5rem;letter-spacing:.04em;color:#b2bac5;font-weight:500;user-select:text}
+
+
+/* Acceso sin EO · v0.3.24 */
+.session-state{display:flex;flex-direction:column;gap:3px;padding:10px 0;border-bottom:1px solid var(--line)}.session-state strong{font-size:.8rem;color:var(--navy)}.session-state span{font-size:.66rem;line-height:1.35;color:var(--muted)}.no-community .identity-button:disabled{opacity:1}.no-community .identity-button{cursor:pointer}
