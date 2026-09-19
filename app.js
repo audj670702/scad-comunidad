@@ -1,4 +1,4 @@
-const VERSION='0.3.27';
+const VERSION='0.3.28';
 const AUTH_URL='https://www.scad.mx/com-autenticacion';
 const CONTEXT_URL='https://www.scad.mx/_functions/comPwaContext';
 const MIS_CURSOS_URL='https://www.scad.mx/mis-cursos';
@@ -48,21 +48,27 @@ function renderContext(){document.querySelectorAll('[data-module],.bottom-nav .n
 
 function openActivity(a){if(!a)return;showModal(a.titulo,a.descripcion||'',`<div class="prototype-row"><strong>Inicio</strong><span>${new Date(a.inicio).toLocaleString('es-MX')}</span></div>${a.fin?`<div class="prototype-row"><strong>Término</strong><span>${new Date(a.fin).toLocaleString('es-MX')}</span></div>`:''}${a.ubicacion?`<div class="prototype-row"><strong>Lugar</strong><span>${esc(a.ubicacion)}</span></div>`:''}${a.enlace?`<a class="prototype-row" href="${esc(a.enlace)}" target="_blank" rel="noopener"><strong>Abrir enlace</strong><span>↗</span></a>`:''}`)}
 function activityDayKey(value){const d=new Date(value);return Number.isNaN(d.getTime())?'':d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function activityTimeLabel(a){if(a?.todoElDia)return'Todo el día';const d=new Date(a?.inicio);return Number.isNaN(d.getTime())?'':d.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})}
 function renderProgramacionCalendar(){
   const all=context?.actividades||[];
   const types=[...new Set(all.map(a=>String(a.tipoActividad||'Actividad').trim()).filter(Boolean))].sort((x,y)=>x.localeCompare(y,'es'));
-  const filtered=calendarType==='TODAS'?all:all.filter(a=>String(a.tipoActividad||'Actividad').trim()===calendarType);
+  const filtered=(calendarType==='TODAS'?all:all.filter(a=>String(a.tipoActividad||'Actividad').trim()===calendarType))
+    .slice().sort((a,b)=>new Date(a.inicio)-new Date(b.inicio));
   const year=calendarCursor.getFullYear(),month=calendarCursor.getMonth(),first=new Date(year,month,1),days=new Date(year,month+1,0).getDate(),offset=(first.getDay()+6)%7;
   const byDay=new Map();
   filtered.forEach(a=>{const key=activityDayKey(a.inicio);if(!key)return;if(!byDay.has(key))byDay.set(key,[]);byDay.get(key).push(a)});
   const cells=[];
   for(let n=0;n<offset;n++)cells.push('<div class="calendar-day calendar-day-empty"></div>');
-  for(let day=1;day<=days;day++){const key=year+'-'+String(month+1).padStart(2,'0')+'-'+String(day).padStart(2,'0'),items=byDay.get(key)||[],today=activityDayKey(new Date())===key;cells.push(`<button class="calendar-day${today?' is-today':''}${items.length?' has-events':''}" type="button" data-day="${key}" ${items.length?'':'disabled'}><span class="calendar-number">${day}</span>${items.slice(0,3).map(x=>`<span class="calendar-event-dot" title="${esc(x.titulo)}"></span>`).join('')}${items.length>3?`<small>+${items.length-3}</small>`:''}</button>`)}
-  modalContent.innerHTML=`<div class="calendar-toolbar"><button class="calendar-nav" id="calendarPrev" type="button" aria-label="Mes anterior">‹</button><strong>${first.toLocaleDateString('es-MX',{month:'long',year:'numeric'})}</strong><button class="calendar-nav" id="calendarNext" type="button" aria-label="Mes siguiente">›</button></div><label class="calendar-filter"><span>Tipo de actividad</span><select id="calendarType"><option value="TODAS">Todas</option>${types.map(t=>`<option value="${esc(t)}" ${calendarType===t?'selected':''}>${esc(t)}</option>`).join('')}</select></label><div class="calendar-weekdays"><span>LUN</span><span>MAR</span><span>MIÉ</span><span>JUE</span><span>VIE</span><span>SÁB</span><span>DOM</span></div><div class="calendar-grid">${cells.join('')}</div><div class="calendar-day-list" id="calendarDayList"></div>`;
+  for(let day=1;day<=days;day++){
+    const key=year+'-'+String(month+1).padStart(2,'0')+'-'+String(day).padStart(2,'0'),items=byDay.get(key)||[],today=activityDayKey(new Date())===key;
+    const events=items.map(a=>`<button class="calendar-event" type="button" data-activity-id="${esc(a.id)}" title="${esc(activityTimeLabel(a)+' · '+(a.titulo||'Actividad'))}"><span class="calendar-event-time">${esc(activityTimeLabel(a))}</span><span class="calendar-event-title">${esc(a.titulo||'Actividad')}</span></button>`).join('');
+    cells.push(`<div class="calendar-day${today?' is-today':''}${items.length?' has-events':''}" data-day="${key}"><span class="calendar-number">${day}</span><div class="calendar-events">${events}</div></div>`);
+  }
+  modalContent.innerHTML=`<div class="calendar-toolbar"><button class="calendar-nav" id="calendarPrev" type="button" aria-label="Mes anterior">‹</button><strong>${first.toLocaleDateString('es-MX',{month:'long',year:'numeric'})}</strong><button class="calendar-nav" id="calendarNext" type="button" aria-label="Mes siguiente">›</button></div><label class="calendar-filter"><span>Tipo de actividad</span><select id="calendarType"><option value="TODAS">Todas</option>${types.map(t=>`<option value="${esc(t)}" ${calendarType===t?'selected':''}>${esc(t)}</option>`).join('')}</select></label><div class="calendar-weekdays"><span>LUN</span><span>MAR</span><span>MIÉ</span><span>JUE</span><span>VIE</span><span>SÁB</span><span>DOM</span></div><div class="calendar-grid">${cells.join('')}</div></div>`;
   $('calendarPrev').onclick=()=>{calendarCursor=new Date(year,month-1,1);renderProgramacionCalendar()};
   $('calendarNext').onclick=()=>{calendarCursor=new Date(year,month+1,1);renderProgramacionCalendar()};
   $('calendarType').onchange=e=>{calendarType=e.target.value;renderProgramacionCalendar()};
-  modalContent.querySelectorAll('[data-day]').forEach(b=>b.onclick=()=>{const items=filtered.filter(a=>activityDayKey(a.inicio)===b.dataset.day),box=$('calendarDayList');box.innerHTML=items.map(a=>`<button class="calendar-activity activity-open" data-id="${esc(a.id)}" type="button"><span><small>${esc(a.tipoActividad||'Actividad')}</small><strong>${esc(a.titulo)}</strong></span><time>${a.todoElDia?'Todo el día':new Date(a.inicio).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})}</time></button>`).join('');box.querySelectorAll('.activity-open').forEach(x=>x.onclick=()=>openActivity(all.find(a=>String(a.id)===x.dataset.id)))})
+  modalContent.querySelectorAll('[data-activity-id]').forEach(button=>button.onclick=e=>{e.stopPropagation();const activity=all.find(a=>String(a.id)===button.dataset.activityId);openActivity(activity)});
 }
 function openProgramacion(){markProgramacionSeen();const now=new Date();calendarCursor=new Date(now.getFullYear(),now.getMonth(),1);calendarType='TODAS';showModal('Programación','','<div class="calendar-loading">Cargando calendario…</div>');renderProgramacionCalendar()}
 function openDocumentos(){const list=context?.documentos||[];showModal('Documentación','',list.length?list.map(d=>`<a class="prototype-row" href="${esc(d.documentoUrl)}" target="_blank" rel="noopener"><strong>${esc(d.titulo)}</strong><span>${esc(d.categoria||d.nombreArchivo||'Abrir')} ↗</span></a>`).join(''):'<div class="prototype-row"><strong>No hay documentos disponibles.</strong></div>')}
