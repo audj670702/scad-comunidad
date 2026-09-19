@@ -1,4 +1,4 @@
-const CACHE='scad-comunidad-v0.3.25';
+const CACHE='scad-comunidad-v0.3.26';
 
 self.addEventListener('install',event=>{
   self.skipWaiting();
