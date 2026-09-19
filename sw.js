@@ -1,5 +1,5 @@
-const CACHE='scad-comunidad-v0.3.20';
+const CACHE='scad-comunidad-v0.3.21';
 const ASSETS=['./','./index.html','./styles.css','./install.css','./admin.css','./app.js','./install.js','./admin.js','./com-mns.js','./mns-frontend-v052.html','./mns-frontend.html','./manifest.json','./img/logo_scad_comunidad.png','./img/icon_scad_comunidad_192.png','./img/icon_scad_comunidad_512.png','./img/scad_comunidad_favicon.png'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)));self.skipWaiting()});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))));self.clients.claim()});
-self.addEventListener('fetch',event=>{if(event.request.method!=='GET')return;if(event.request.url.includes('/_functions/'))return;event.respondWith(fetch(event.request).then(response=>{const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy));return response}).catch(()=>caches.match(event.request).then(cached=>cached||caches.match('./index.html'))))});
+self.addEventListener('fetch',event=>{if(event.request.method!=='GET')return;if(event.request.url.includes('/_functions/'))return;event.respondWith(fetch(event.request).then(response=>{if(response.status===200){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy)).catch(()=>{})}return response}).catch(()=>caches.match(event.request).then(cached=>cached||caches.match('./index.html'))))});
