@@ -65,3 +65,11 @@ Crear el contrato de datos/API entre GitHub y Wix antes de sustituir los datos d
 - `GET /tv/canales`
 
 La nomenclatura final de endpoints y colecciones CMS debe definirse junto con la construcción del backend Velo.
+
+## Monitor normalizado · v0.3.29
+
+CH 00 utiliza exclusivamente el contexto vigente de la comunidad y el miembro solicitado en `comPwaContext`. Se conserva el flujo de acceso existente. Las respuestas de otra comunidad, de otro miembro o de una sesión anterior no se aplican al canal. Una denegación de acceso detiene el canal privado.
+
+CH 01–02 reproducen señales digitales; CH 03+ se consultan en el catálogo público de SYS. El Monitor muestra canal y título sobre la imagen, controles de sonido, Canales y ampliar, e indicador de carga y reconexión.
+
+Pruebas: `node --test tests/*.test.*`.
